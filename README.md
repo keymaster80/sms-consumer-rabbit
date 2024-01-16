@@ -21,6 +21,8 @@ Pasos:
   npm install
   ```
 
+3. Editar los archivos de configuración según el caso (carpeta config/).
+
 4. Los logs de ejecución quedan en la carpeta `logs` del proyecto.
 
 5. Para iniciarlo como demonio usando [pm2](http://pm2.keymetrics.io/), se debe instalar primero este servicio:

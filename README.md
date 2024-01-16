@@ -2,7 +2,7 @@
 
 Aplicativo de consumidor Rabbit para envio a SMS proveedor. Hecho con NodeJS + SQL Server + Request Promise Native + AMQLIB (RABBITMQ).
 
-## Para setupear un ambiente de desarrollo:
+## Para setupear el aplicativo:
 
 Requisitos:
 

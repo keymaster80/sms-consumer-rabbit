@@ -3,13 +3,13 @@ const log4js = require("log4js");
 let rp = require("request-promise-native");
 
 // Import config
-let SMSAMOVIL_URL = require("../config/integrations.config").SMSAMOVIL_URL;
-let SMSAMOVIL_AUTH = require("../config/integrations.config").SMSAMOVIL_AUTH;
-let SMSAMOVIL_APIKEY = require("../config/integrations.config").SMSAMOVIL_APIKEY;
-let SMSAMOVIL_COUNTRY = require("../config/integrations.config").SMSAMOVIL_COUNTRY;
-let SMSAMOVIL_DIAL = require("../config/integrations.config").SMSAMOVIL_DIAL;
-let SMSAMOVIL_TAG = require("../config/integrations.config").SMSAMOVIL_TAG;
-let SMSAMOVIL_TIMEOUT = require("../config/integrations.config").SMSAMOVIL_TIMEOUT;
+let SMSServex_URL = require("../config/integrations.config").SMSServex_URL;
+let SMSServex_AUTH = require("../config/integrations.config").SMSServex_AUTH;
+let SMSServex_APIKEY = require("../config/integrations.config").SMSServex_APIKEY;
+let SMSServex_COUNTRY = require("../config/integrations.config").SMSServex_COUNTRY;
+let SMSServex_DIAL = require("../config/integrations.config").SMSServex_DIAL;
+let SMSServex_TAG = require("../config/integrations.config").SMSServex_TAG;
+let SMSServex_TIMEOUT = require("../config/integrations.config").SMSServex_TIMEOUT;
 // Obtengo logger
 let logger = log4js.getLogger('ServerScripts');
 
@@ -31,16 +31,16 @@ class SMSSender{
     
         // Formo el body del request del proveedor
         let requestSMS = {
-            apiKey: SMSAMOVIL_APIKEY,
-            country: SMSAMOVIL_COUNTRY,
-            dial: SMSAMOVIL_DIAL,
+            apiKey: SMSServex_APIKEY,
+            country: SMSServex_COUNTRY,
+            dial: SMSServex_DIAL,
             message: message,
             msisdns: msisdns,
-            tag: SMSAMOVIL_TAG
+            tag: SMSServex_TAG
         }
         
         // Armo el request
-        let url = SMSAMOVIL_URL;
+        let url = SMSServex_URL;
         
         let options = {
           url: url,
@@ -48,10 +48,10 @@ class SMSSender{
           body: requestSMS,
           json: true,
           strictSSL: false,
-          timeout: SMSAMOVIL_TIMEOUT,
+          timeout: SMSServex_TIMEOUT,
           headers:{
             "Content-Type": "application/json",
-            "Authorization": SMSAMOVIL_AUTH
+            "Authorization": SMSServex_AUTH
           }
         }
 
@@ -62,12 +62,12 @@ class SMSSender{
         await rp(options).then(function (response) {
           responseSMS = response;
         })  
-        sqlResponse = await sqlConector.executeStoredProcedure(msisdns.toString(), JSON.stringify(requestSMS), JSON.stringify(responseSMS), SMSAMOVIL_URL);
+        sqlResponse = await sqlConector.executeStoredProcedure(msisdns.toString(), JSON.stringify(requestSMS), JSON.stringify(responseSMS), SMSServex_URL);
 
     } catch (err) {
       logger.error("Ocurrio un error al enviar SMS al proveedor, error: ")
       logger.error(err);
-      sqlResponse = await sqlConector.executeStoredProcedure(msisdns.toString(), JSON.stringify(requestSMS), err, SMSAMOVIL_URL);
+      sqlResponse = await sqlConector.executeStoredProcedure(msisdns.toString(), JSON.stringify(requestSMS), err, SMSServex_URL);
     }
   }
 }

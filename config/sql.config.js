@@ -1,9 +1,9 @@
 // SQL
-exports.MSSQL_HOST = '192.168.0.105';
+exports.MSSQL_HOST = '10.150.76.245';
 exports.MSSQL_PORT = 1433;
 exports.MSSQL_USER = 'sa';
 exports.MSSQL_PASSWORD = 'inc2001';
-exports.MSSQL_DATABASE = 'TEST';
+exports.MSSQL_DATABASE = 'Servex';
 exports.MSSQL_CONN_TIMEOUT = 30 * 1000;
 exports.MSSQL_REQ_TIMEOUT = 300 * 1000;
 exports.MSSQL_POOL_MIN = 0;

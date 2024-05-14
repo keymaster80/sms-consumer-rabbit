@@ -54,7 +54,7 @@ class SQLConector{
         // Close conection to database
         await pool.close();
 
-        return true;
+        return result;
 
     } catch (err) {
         logger.error("Ocurrio un error al ejecutar Store procedure executeStoredProcedureValidateToken, error: ")
@@ -64,6 +64,50 @@ class SQLConector{
 
     }
   }
+
+  async insertNewToken(token,fechaExpiracion,outPut){
+    let MSSQL_CONFIG = {
+        user: MSSQL_USER,
+        password: MSSQL_PASSWORD,
+        server: MSSQL_HOST,
+        database: MSSQL_DATABASE,
+        port: MSSQL_PORT,
+        pool: {
+            max: MSSQL_POOL_MAX,
+            min: MSSQL_POOL_MIN,
+            idleTimeoutMillis: MSSQL_POOL_IDLE_TIMEOUT
+        },
+        options: {
+            encrypt: MSSQL_ENCRYPT,
+            useUTC: MSSQL_USE_UTC,
+            connectionTimeout: MSSQL_CONN_TIMEOUT,
+            requestTimeout: MSSQL_REQ_TIMEOUT,
+        }
+    };
+    try {
+        // Create conection to database
+        const pool = await sql.connect(MSSQL_CONFIG);
+        // Execute store procedure
+        const result = await pool.request()
+            .input('token', token)
+            .input('fechaExpiracion', fechaExpiracion)
+            .input('insertExitoso', outPut)
+            .execute(`insertValidTokenServex`);
+        // Close conection to database
+        await pool.close();
+
+        return true;
+
+    } catch (err) {
+        logger.error("Ocurrio un error al ejecutar Store procedure, error: ")
+        logger.error(err);
+
+        return false;
+
+    }
+
+  }
+
 
   async executeStoredProcedure(address, request, response, url){
 

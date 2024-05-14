@@ -1,15 +1,20 @@
 // Import libraries
 const log4js = require("log4js");
 let rp = require("request-promise-native");
+let token;
 
 // Import config
 let SMSServex_URL = require("../config/integrations.config").SMSServex_URL;
-let SMSServex_AUTH = require("../config/integrations.config").SMSServex_AUTH;
+let SMSServex_URL_AUTH = require("../config/integrations.config").SMSServex_URL_AUTH;
 let SMSServex_APIKEY = require("../config/integrations.config").SMSServex_APIKEY;
 let SMSServex_COUNTRY = require("../config/integrations.config").SMSServex_COUNTRY;
 let SMSServex_DIAL = require("../config/integrations.config").SMSServex_DIAL;
 let SMSServex_TAG = require("../config/integrations.config").SMSServex_TAG;
 let SMSServex_TIMEOUT = require("../config/integrations.config").SMSServex_TIMEOUT;
+
+let SMSUserName = require("../config/integrations.config").SMSUserName;
+let SMSpassword = require("../config/integrations.config").SMSpassword;
+
 // Obtengo logger
 let logger = log4js.getLogger('ServerScripts');
 
@@ -21,6 +26,58 @@ const sqlConector = new SQLConector();
 class SMSSender{
   
   constructor(){}
+
+  async validateTokenServex(){
+    let sqlResponseValidateToken;
+    try{
+      sqlResponseValidateToken = await sqlConector.executeStoredProcedureValidateToken();
+      if(sqlResponseValidateToken=='noValidToken'){
+        token = await generateToken();
+      }else{
+        token = sqlResponseValidateToken
+      }
+    }catch(e){
+      logger.error("Ocurrió un error al solicitar el token al proveedor:", e);
+      throw e;
+    }
+    return token;
+  }
+
+  async generateToken(){
+
+    try{
+      let requestNewToken ={
+        username: SMSUserName,
+        password: SMSpassword
+      }
+      let urlAuth = SMSServex_URL_AUTH;
+
+      let optionsAuth={
+        method: 'POST',
+        url: urlAuth,
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: requestNewToken,
+        json: true,
+        strictSSL: false,
+        timeout: SMSServex_TIMEOUT
+      }
+      let responseAUTH;
+      let sqlResponse;
+      await rp(options).then(function (response) {
+          responseAUTH = response;
+          token = responseAUTH.token;
+      })
+      sqlResponse = await sqlConector.insertNewToken(token,JSON.stringify(responseAUTH.expires),''); 
+    }
+    
+    catch(e){
+      logger.error("Ocurrio un error al solicitar token al proveedor, error: ")
+      logger.error(e);
+    }
+    return token;
+  }
 
   async sendSMS(request){
     let message = request.message;

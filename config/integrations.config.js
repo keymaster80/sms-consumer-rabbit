@@ -4,10 +4,11 @@ exports.RABBITMQ_QUEUE = "sms_flujos";
 exports.RABBIT_SETTINGS_DURABLE = true;
 
 // SMS MABE
-exports.SMSAMOVIL_URL = "https://smsamovil.apisanta.com/brdcstr-endpoint-web/services/messaging/";
-exports.SMSAMOVIL_AUTH = "Xxrj9jvfXJaF4RreNmGasyjeKLU=";
-exports.SMSAMOVIL_APIKEY = 14151;
-exports.SMSAMOVIL_COUNTRY = "MX";
-exports.SMSAMOVIL_DIAL = 30305;
-exports.SMSAMOVIL_TAG = "tag-prueba";
-exports.SMSAMOVIL_TIMEOUT = 10000;
+exports.SMSServex_URL = "http://mayten.cloud/api/Mensajes/Texto/";
+exports.SMSServex_URL_AUTH = "http://mayten.cloud/auth/";
+//exports.SMSServex_AUTH = "Xxrj9jvfXJaF4RreNmGasyjeKLU=";
+exports.SMSServex_APIKEY = 14151;
+exports.SMSServex_COUNTRY = "MX";
+exports.SMSServex_DIAL = 30305;
+exports.SMSServex_TAG = "tag-prueba";
+exports.SMSServex_TIMEOUT = 10000;

@@ -2,7 +2,7 @@
 var log4js = require("log4js");
 var path = require('path');
 var fs = require('fs');
-// Este es un comentario para probar sincronizacion ok
+// Este es un comentario para probar sincronizacion ok2
 // Importo configuraciones
 var LOGGER_CONFIG = require("./config/logger.config").LOGGER_CONFIG;
 

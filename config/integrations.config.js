@@ -12,3 +12,6 @@ exports.SMSServex_COUNTRY = "MX";
 exports.SMSServex_DIAL = 30305;
 exports.SMSServex_TAG = "tag-prueba";
 exports.SMSServex_TIMEOUT = 10000;
+
+exports.SMSUserName = "edwin.vizcarra@servex.com.pe";
+exports.SMSpassword = "Servexperu1@";

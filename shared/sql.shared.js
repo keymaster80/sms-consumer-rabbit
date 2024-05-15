@@ -49,7 +49,7 @@ class SQLConector{
     try {
         // Create conection to database
         const pool = await sql.connect(MSSQL_CONFIG);
-        console.log('el pool es ',pool)
+        logger.error ('el pool es ',pool);
         // Execute store procedure
         const result = await pool.request().execute(`validateTokenServex`);
         // Close conection to database

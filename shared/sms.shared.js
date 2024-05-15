@@ -49,7 +49,7 @@ class SMSSender{
   }
 
   async generateToken(){
-
+    let token;
     try{
       let requestNewToken ={
         username: SMSUserName,

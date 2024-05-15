@@ -35,11 +35,11 @@ class SMSSender{
     let sqlResponseValidateToken;
     try{
       sqlResponseValidateToken = await sqlConector.executeStoredProcedureValidateToken();
-      console.log("el token devuelto es ",sqlResponseValidateToken);
+      console.log("el token devuelto es ",sqlResponseValidateToken.recordset[0].token);
       if(sqlResponseValidateToken=='noValidToken'){
         token = await generateToken();
       }else{
-        token = sqlResponseValidateToken
+        token = sqlResponseValidateToken.recordset[0].token
       }
     }catch(e){
       logger.error("Ocurrió un error al solicitar el token al proveedor:", e);
@@ -139,12 +139,12 @@ class SMSSender{
           await rp(options).then(function (response) {
             responseSMS = response;
           })  
-          sqlResponse = await sqlConector.executeStoredProcedure(msisdns.toString(), JSON.stringify(requestSMS), JSON.stringify(responseSMS), SMSServex_URL);
+          sqlResponse = await sqlConector.executeStoredProcedure(telefonos.toString(), JSON.stringify(requestSMS), JSON.stringify(responseSMS), SMSServex_URL);
   
       } catch (err) {
         logger.error("Ocurrio un error al enviar SMS al proveedor, error: ")
         logger.error(err);
-        sqlResponse = await sqlConector.executeStoredProcedure(msisdns.toString(), JSON.stringify(requestSMS), err, SMSServex_URL);
+        sqlResponse = await sqlConector.executeStoredProcedure(telefonos.toString(), JSON.stringify(requestSMS), err, SMSServex_URL);
       }
     }
 

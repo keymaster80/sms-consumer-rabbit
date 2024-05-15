@@ -36,7 +36,7 @@ class SMSSender{
     try{
       sqlResponseValidateToken = await sqlConector.executeStoredProcedureValidateToken();
       console.log("el token devuelto es ",sqlResponseValidateToken.recordset[0].token);
-      if(sqlResponseValidateToken=='noValidToken'){
+      if(sqlResponseValidateToken.recordset[0].token=='noValidToken'){
         token = await generateToken();
       }else{
         token = sqlResponseValidateToken.recordset[0].token

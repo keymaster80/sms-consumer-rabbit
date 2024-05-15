@@ -36,7 +36,7 @@ class RabitConsumer{
           if (message) {
             let requestSMS = JSON.parse(message.content.toString());
             console.log(requestSMS);
-            await smsSender.sendSMS(requestSMS);
+            await smsSender.sendSMS(requestSMS); //comentar esta linea para testing
           }
         },
         { noAck: true }

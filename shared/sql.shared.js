@@ -139,7 +139,7 @@ class SQLConector{
             .input('Body', request)
             .input('Response', response)
             .input('Url', url)
-            .execute(`InsertarLogSMS`);
+            .execute(`insertarLogSMS`);
         // Close conection to database
         await pool.close();
 

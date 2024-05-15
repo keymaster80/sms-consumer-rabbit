@@ -86,7 +86,7 @@ class SMSSender{
   }
 
   async sendSMS(request){
-    let tokenRecibido = validateTokenServex()
+    let tokenRecibido = await this.validateTokenServex()
 
     if(!tokenRecibido) {
       logger.error("No se recibio un token");

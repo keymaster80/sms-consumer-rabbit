@@ -115,7 +115,7 @@ class SMSSender{
               origen: SMSOrigen,
               mensajes: messages
           }
-          
+          logger.error('el requestSMS es ',requestSMS);
           // Armo el request
           let url = SMSServex_URL;
           

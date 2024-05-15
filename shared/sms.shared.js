@@ -1,7 +1,7 @@
 // Import libraries
 const log4js = require("log4js");
 let rp = require("request-promise-native");
-let token;
+
 
 // Import config
 let SMSServex_URL = require("../config/integrations.config").SMSServex_URL;
@@ -10,10 +10,13 @@ let SMSServex_APIKEY = require("../config/integrations.config").SMSServex_APIKEY
 let SMSServex_COUNTRY = require("../config/integrations.config").SMSServex_COUNTRY;
 let SMSServex_DIAL = require("../config/integrations.config").SMSServex_DIAL;
 let SMSServex_TAG = require("../config/integrations.config").SMSServex_TAG;
-let SMSServex_TIMEOUT = require("../config/integrations.config").SMSServex_TIMEOUT;
+let SMSServex_TIMEOUT_AUTH = require("../config/integrations.config").SMSServex_TIMEOUT_AUTH;
+let SMSServex_TIMEOUT_Request = require("../config/integrations.config").SMSServex_TIMEOUT_Request;
 
 let SMSUserName = require("../config/integrations.config").SMSUserName;
 let SMSpassword = require("../config/integrations.config").SMSpassword;
+
+let SMSOrigen = require("../config/integrations.config").SMSOrigen;
 
 // Obtengo logger
 let logger = log4js.getLogger('ServerScripts');
@@ -28,9 +31,11 @@ class SMSSender{
   constructor(){}
 
   async validateTokenServex(){
+    let token;
     let sqlResponseValidateToken;
     try{
       sqlResponseValidateToken = await sqlConector.executeStoredProcedureValidateToken();
+      console.log("el token devuelto es ",sqlResponseValidateToken);
       if(sqlResponseValidateToken=='noValidToken'){
         token = await generateToken();
       }else{
@@ -61,15 +66,16 @@ class SMSSender{
         body: requestNewToken,
         json: true,
         strictSSL: false,
-        timeout: SMSServex_TIMEOUT
+        timeout: SMSServex_TIMEOUT_AUTH
       }
       let responseAUTH;
       let sqlResponse;
-      await rp(options).then(function (response) {
+      await rp(optionsAuth).then(function (response) {
           responseAUTH = response;
           token = responseAUTH.token;
       })
-      sqlResponse = await sqlConector.insertNewToken(token,JSON.stringify(responseAUTH.expires),''); 
+      sqlResponse = await sqlConector.insertNewToken(token,responseAUTH.expires,''); 
+      logger.info('Resultado de la insercion del token ',sqlResponse);
     }
     
     catch(e){
@@ -80,53 +86,73 @@ class SMSSender{
   }
 
   async sendSMS(request){
-    let message = request.message;
-    let id = request.id;
-    let msisdns = request.addresses;
+    let tokenRecibido = validateTokenServex()
 
-    try {
-    
-        // Formo el body del request del proveedor
-        let requestSMS = {
-            apiKey: SMSServex_APIKEY,
-            country: SMSServex_COUNTRY,
-            dial: SMSServex_DIAL,
-            message: message,
-            msisdns: msisdns,
-            tag: SMSServex_TAG
+    if(!tokenRecibido) {
+      logger.error("No se recibio un token");
+
+    }else{
+
+      let message = request.message;
+      let id = request.id;
+      let telefonos = request.addresses;
+  
+      try {
+
+        let messages = [];
+
+        for(let telefono of telefonos){
+          messages.push(
+            {
+                mensaje: message,
+                telefono: telefono,
+                identificador: id
+            })
         }
-        
-        // Armo el request
-        let url = SMSServex_URL;
-        
-        let options = {
-          url: url,
-          method: "POST",
-          body: requestSMS,
-          json: true,
-          strictSSL: false,
-          timeout: SMSServex_TIMEOUT,
-          headers:{
-            "Content-Type": "application/json",
-            "Authorization": SMSServex_AUTH
+      
+          // Formo el body del request del proveedor
+          let requestSMS = {
+              origen: SMSOrigen,
+              mensajes: messages
           }
-        }
-
-        let responseSMS;
-        let sqlResponse;
-
-        // Ejecuto el POST
-        await rp(options).then(function (response) {
-          responseSMS = response;
-        })  
-        sqlResponse = await sqlConector.executeStoredProcedure(msisdns.toString(), JSON.stringify(requestSMS), JSON.stringify(responseSMS), SMSServex_URL);
-
-    } catch (err) {
-      logger.error("Ocurrio un error al enviar SMS al proveedor, error: ")
-      logger.error(err);
-      sqlResponse = await sqlConector.executeStoredProcedure(msisdns.toString(), JSON.stringify(requestSMS), err, SMSServex_URL);
+          
+          // Armo el request
+          let url = SMSServex_URL;
+          
+          let options = {
+            url: url,
+            method: "POST",
+            body: requestSMS,
+            json: true,
+            strictSSL: false,
+            timeout: SMSServex_TIMEOUT_Request,
+            headers:{
+              "Content-Type": "application/json",
+              "Authorization": "Bearer " +tokenRecibido
+            }
+          }
+  
+          let responseSMS;
+          let sqlResponse;
+  
+          // Ejecuto el POST
+          await rp(options).then(function (response) {
+            responseSMS = response;
+          })  
+          sqlResponse = await sqlConector.executeStoredProcedure(msisdns.toString(), JSON.stringify(requestSMS), JSON.stringify(responseSMS), SMSServex_URL);
+  
+      } catch (err) {
+        logger.error("Ocurrio un error al enviar SMS al proveedor, error: ")
+        logger.error(err);
+        sqlResponse = await sqlConector.executeStoredProcedure(msisdns.toString(), JSON.stringify(requestSMS), err, SMSServex_URL);
+      }
     }
-  }
+
+    }
+
+
+
+ 
 }
 
 module.exports = SMSSender;
